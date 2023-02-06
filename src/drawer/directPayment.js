@@ -1,12 +1,15 @@
 import { View, Text, TouchableOpacity, Image, TextInput, FlatList } from 'react-native'
-import React from 'react'
+import React,{useEffect, useState}  from 'react'
 import Color from '../components/Color'
 import Font from '../components/Font'
 import Icon from 'react-native-vector-icons/FontAwesome';
 import Icon1 from 'react-native-vector-icons/AntDesign';
 import { responsiveFontSize, responsiveHeight, responsiveWidth } from 'react-native-responsive-dimensions'
+import { useFocusEffect } from '@react-navigation/native';
+
 
 const DirectPayment = ({navigation}) => {
+
   const data = [
     {
       name : "Umer Sialkot",
@@ -41,6 +44,38 @@ const DirectPayment = ({navigation}) => {
     wallet: '34534'
     },
   ]
+const [payment , setPayment] = useState([])
+  const fetchDirectPayment = () =>{
+    var formdata = new FormData();
+    formdata.append("__api_key__", "hi,-its-eevee. I can do wonderful things in api creation.");
+    
+    var requestOptions = {
+      method: 'POST',
+      body: formdata,
+      redirect: 'follow'
+    };
+    
+    fetch("https://api.accounts.lighthousepakistan.online/fetch_direct_payments.php", requestOptions)
+      .then(response => response.text())
+      .then(result => {
+        const data = JSON.parse(result);
+        console.log(data.data.direct_payments);
+        setPayment(data.data.direct_payments)
+      })
+      .catch(error => console.log('error', error));
+  }
+
+  // useFocusEffect(() => {
+  //   fetchDirectPayment()
+  // }, [])
+  
+  useFocusEffect(
+    React.useCallback(() => {
+      fetchDirectPayment();
+    }, []),
+  );
+
+
   return (
     <View style={{flex:1, backgroundColor:Color.gray}}>
       {/* Header  */}
@@ -77,7 +112,7 @@ const DirectPayment = ({navigation}) => {
 
       <View style={{width:responsiveWidth(90), height:responsiveHeight(10), backgroundColor:'white', alignSelf:'center', flexDirection:'row', justifyContent:'space-between', alignItems:'center', borderRadius:10, elevation:3}}>
         <Text style={{fontFamily:Font.Regular, color:Color.primery, fontSize:responsiveFontSize(3), marginLeft:responsiveWidth(3)}}>Direct Payment</Text>
-        <TouchableOpacity style={{alignItems:'center', justifyContent:"center", width:60, height:30, backgroundColor:Color.primery, borderRadius:5, marginRight:responsiveWidth(3)}}>
+        <TouchableOpacity style={{alignItems:'center', justifyContent:"center", width:60, height:30, backgroundColor:Color.primery, borderRadius:5, marginRight:responsiveWidth(3)}} onPress={()=> navigation.navigate('AddDirectPayment')}>
           <Text style={{color:Color.white, fontFamily:Font.Medium}}>Add</Text>
         </TouchableOpacity>
       </View>
@@ -85,30 +120,24 @@ const DirectPayment = ({navigation}) => {
       {/* FlateList Working Here  */}
 
       <FlatList 
-      data={data}
+      data={payment}
       contentContainerStyle={{paddingBottom:100}}
       renderItem={({item})=> 
-      <View style={{width:responsiveWidth(90), height:responsiveHeight(20), backgroundColor:Color.white, elevation:5, borderRadius:10, alignSelf:'center',marginTop:10}}>
+      <View style={{width:responsiveWidth(90), height:responsiveHeight(15), backgroundColor:Color.white, elevation:5, borderRadius:10, alignSelf:'center',justifyContent:'center',marginTop:10}}>
       <View style={{width:'90%', height:'36%', alignItems:'center', justifyContent:'space-between' ,flexDirection:'row', padding:responsiveWidth(0), alignSelf:'center', paddingRight:'5%'}}>
-        <Text style={{fontFamily:Font.Regular, color:'#6B7280', fontSize:responsiveFontSize(2),}}>Name:<Text style={{fontFamily:Font.Bold, color:'#6B7280'}}> Hammad</Text></Text>
-        <Text style={{fontFamily:Font.Regular, color:'#6B7280', fontSize:responsiveFontSize(2), marginLeft:responsiveWidth(0)}}>City:<Text style={{fontFamily:Font.Bold, color:'#6B7280'}}> Sargodha</Text></Text>
+        <Text style={{fontFamily:Font.Regular, color:'#6B7280', fontSize:responsiveFontSize(2),}}>Name:<Text style={{fontFamily:Font.Bold, color:'#6B7280'}}> {item.customer_name}</Text></Text>
+        <Text style={{fontFamily:Font.Regular, color:'#6B7280', fontSize:responsiveFontSize(2), marginLeft:responsiveWidth(0)}}>Method:<Text style={{fontFamily:Font.Bold, color:'#6B7280'}}> {item.method}</Text></Text>
       </View>
 
-      <View style={{width:'90%', height:'36%', alignItems:'center', justifyContent:'space-between' ,flexDirection:'row', padding:responsiveWidth(0), alignSelf:'center', paddingRight:'5%', bottom:responsiveHeight(2)}}>
-        <Text style={{fontFamily:Font.Regular, color:'#6B7280', fontSize:responsiveFontSize(2),}}>Name:<Text style={{fontFamily:Font.Bold, color:'#6B7280'}}> {item.name}</Text></Text>
-        <Text style={{fontFamily:Font.Regular, color:'#6B7280', fontSize:responsiveFontSize(2), marginLeft:responsiveWidth(0)}}>City:<Text style={{fontFamily:Font.Bold, color:'#6B7280'}}> {item.city}</Text></Text>
+      <View style={{width:'90%', height:'36%', alignItems:'center', justifyContent:'space-between' ,flexDirection:'row', padding:responsiveWidth(0), alignSelf:'center', paddingRight:'5%', bottom:responsiveHeight(0)}}>
+        <Text style={{fontFamily:Font.Regular, color:'#6B7280', fontSize:responsiveFontSize(2),}}>Company:<Text style={{fontFamily:Font.Bold, color:'#6B7280'}}> {item.company_name}</Text></Text>
+        <Text style={{fontFamily:Font.Regular, color:'#6B7280', fontSize:responsiveFontSize(2), marginLeft:responsiveWidth(0)}}>Amount:<Text style={{fontFamily:Font.Bold, color:'#6B7280'}}> {item.amount}</Text></Text>
       </View>
-      
-      <View style={{width:'90%', height:'35%', padding:responsiveWidth(5), bottom:responsiveHeight(4.5), paddingRight:responsiveWidth(1)}}>
-        <View style={{flexDirection:'row',alignItems:'center', justifyContent:'space-between' ,flexDirection:'row',}}>
-        <Text style={{fontFamily:Font.Regular, color:'#6B7280', fontSize:responsiveFontSize(2),}}>Invoice:<Text style={{fontFamily:Font.Bold, color:'#6B7280'}}> {item.invoice}</Text></Text>
-        <Text style={{fontFamily:Font.Regular, color:'#6B7280', fontSize:responsiveFontSize(2), marginLeft:responsiveWidth(0)}}>Wallet:<Text style={{fontFamily:Font.Bold, color:'#6B7280'}}> {item.wallet}</Text></Text>
-        </View>
-        <View style={{flexDirection:'row', height:responsiveWidth(9), alignItems:'center', justifyContent:'flex-end', marginTop:responsiveHeight(1), width:"120%", alignSelf:'center'}}>
-        <Icon name="edit" size={20} color={Color.primery} style={{marginRight:responsiveWidth(5)}}/>
-        <Icon1 name="delete" size={20} color="#ED718D" />
-        </View>
+
+      <View style={{width:'90%', height:'36%', alignItems:'center', justifyContent:'space-between' ,flexDirection:'row', padding:responsiveWidth(0), alignSelf:'center', paddingRight:'5%', bottom:responsiveHeight(0)}}>
+        <Text style={{fontFamily:Font.Regular, color:'#6B7280', fontSize:responsiveFontSize(2),}}>Discription:<Text style={{fontFamily:Font.Bold, color:'#6B7280'}}> {item.description}</Text></Text>
       </View>
+
     </View>
     }
       keyExtractor={item => item.id}

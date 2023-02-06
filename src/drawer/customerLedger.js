@@ -1,12 +1,12 @@
 import { View, Text, TouchableOpacity, Image, TextInput, FlatList } from 'react-native'
-import React from 'react'
+import React, { useState } from 'react'
 import Color from '../components/Color'
 import Font from '../components/Font'
-import Icon from 'react-native-vector-icons/FontAwesome';
-import Icon1 from 'react-native-vector-icons/AntDesign';
 import { responsiveFontSize, responsiveHeight, responsiveWidth } from 'react-native-responsive-dimensions'
+import { useFocusEffect } from '@react-navigation/native'
 
 const CustomerLedger = ({navigation}) => {
+  const [custoemrData , setCustomerData] = useState([])
   const data = [
     {
       name : "Umer Sialkot",
@@ -41,6 +41,36 @@ const CustomerLedger = ({navigation}) => {
     wallet: '34534'
     },
   ]
+
+  const getCustomerLedger = () =>{
+    var formdata = new FormData();
+    formdata.append("__api_key__", "hi,-its-eevee. I can do wonderful things in api creation.");
+
+    var requestOptions = {
+      method: 'POST',
+      body: formdata,
+      redirect: 'follow'
+    };
+
+    fetch("https://api.accounts.lighthousepakistan.online/fetch_customer_report.php", requestOptions)
+      .then(response => response.text())
+      .then(result => {
+        const data = JSON.parse(result)
+        // console.log(data.data.customer_report);
+        setCustomerData(data.data.customer_report)
+      })
+      .catch(error => console.log('error', error));
+      }
+
+  useFocusEffect(
+    React.useCallback(() => {
+      getCustomerLedger();
+    }, []),
+  );
+
+
+
+
   return (
     <View style={{flex:1, backgroundColor:Color.gray}}>
       {/* Header  */}
@@ -71,43 +101,105 @@ const CustomerLedger = ({navigation}) => {
 
         }}
       />
-
+      {/* Buttons  */}
+        <View style={{width:responsiveWidth(90), height:responsiveHeight(10),marginBottom:responsiveHeight(3), marginTop:responsiveHeight(-3) , alignSelf:'center',flexDirection:'row', justifyContent:"space-around", alignItems:'center'}}>
+          <TouchableOpacity style={{width:responsiveWidth(20), height:responsiveHeight(5), backgroundColor:'#EBEBEB', borderRadius:responsiveWidth(2), alignItems:'center', justifyContent:'center', elevation:3}}>
+            <Text style={{fontFamily:Font.Medium, color:Color.primery}}>Copy</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={{width:responsiveWidth(20), height:responsiveHeight(5), backgroundColor:'#EBEBEB', borderRadius:responsiveWidth(2), alignItems:'center', justifyContent:'center', elevation:3}}>
+            <Text style={{fontFamily:Font.Medium, color:Color.primery}}>CSV</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={{width:responsiveWidth(20), height:responsiveHeight(5), backgroundColor:'#EBEBEB', borderRadius:responsiveWidth(2), alignItems:'center', justifyContent:'center', elevation:3}}>
+            <Text style={{fontFamily:Font.Medium, color:Color.primery}}>Print</Text>
+          </TouchableOpacity>
+        </View>
 
 {/* // Customer Card */}
 
       <View style={{width:responsiveWidth(90), height:responsiveHeight(10), backgroundColor:'white', alignSelf:'center', flexDirection:'row', justifyContent:'space-between', alignItems:'center', borderRadius:10, elevation:3}}>
         <Text style={{fontFamily:Font.Regular, color:Color.primery, fontSize:responsiveFontSize(3), marginLeft:responsiveWidth(3)}}>Customer Report</Text>
-        <TouchableOpacity style={{alignItems:'center', justifyContent:"center", width:60, height:30, backgroundColor:Color.primery, borderRadius:5, marginRight:responsiveWidth(3)}}>
+        {/* <TouchableOpacity style={{alignItems:'center', justifyContent:"center", width:60, height:30, backgroundColor:Color.primery, borderRadius:5, marginRight:responsiveWidth(3)}}>
           <Text style={{color:Color.white, fontFamily:Font.Medium}}>Add</Text>
-        </TouchableOpacity>
+        </TouchableOpacity> */}
       </View>
       
       {/* FlateList Working Here  */}
 
       <FlatList 
-      data={data}
+      data={custoemrData}
       contentContainerStyle={{paddingBottom:100}}
       renderItem={({item})=> 
       <View style={{width:responsiveWidth(90), height:responsiveHeight(20), backgroundColor:Color.white, elevation:5, borderRadius:10, alignSelf:'center',marginTop:10}}>
       <View style={{width:'90%', height:'36%', alignItems:'center', justifyContent:'space-between' ,flexDirection:'row', padding:responsiveWidth(0), alignSelf:'center', paddingRight:'5%'}}>
-        <Text style={{fontFamily:Font.Regular, color:'#6B7280', fontSize:responsiveFontSize(2),}}>Name:<Text style={{fontFamily:Font.Bold, color:'#6B7280'}}> Hammad</Text></Text>
-        <Text style={{fontFamily:Font.Regular, color:'#6B7280', fontSize:responsiveFontSize(2), marginLeft:responsiveWidth(0)}}>City:<Text style={{fontFamily:Font.Bold, color:'#6B7280'}}> Sargodha</Text></Text>
+        <Text style={{fontFamily:Font.Regular, color:'#6B7280', fontSize:responsiveFontSize(2),}}>Date:<Text style={{fontFamily:Font.Bold, color:'#6B7280'}}> {item.created_at}</Text></Text>
+        <Text style={{fontFamily:Font.Regular, color:'#6B7280', fontSize:responsiveFontSize(2), marginLeft:responsiveWidth(0)}}>Invoice:<Text style={{fontFamily:Font.Bold, color:'#6B7280'}}> {item.invoice_code}</Text></Text>
       </View>
 
       <View style={{width:'90%', height:'36%', alignItems:'center', justifyContent:'space-between' ,flexDirection:'row', padding:responsiveWidth(0), alignSelf:'center', paddingRight:'5%', bottom:responsiveHeight(2)}}>
-        <Text style={{fontFamily:Font.Regular, color:'#6B7280', fontSize:responsiveFontSize(2),}}>Name:<Text style={{fontFamily:Font.Bold, color:'#6B7280'}}> {item.name}</Text></Text>
-        <Text style={{fontFamily:Font.Regular, color:'#6B7280', fontSize:responsiveFontSize(2), marginLeft:responsiveWidth(0)}}>City:<Text style={{fontFamily:Font.Bold, color:'#6B7280'}}> {item.city}</Text></Text>
+        <Text style={{fontFamily:Font.Regular, color:'#6B7280', fontSize:responsiveFontSize(2),}}>Discription:<Text style={{fontFamily:Font.Bold, color:'#6B7280'}}> {item.description}</Text></Text>
+        <Text style={{fontFamily:Font.Regular, color:'#6B7280', fontSize:responsiveFontSize(2), marginLeft:responsiveWidth(0)}}>Dabit:<Text style={{fontFamily:Font.Bold, color:'#6B7280'}}> {item.debit}</Text></Text>
       </View>
       
       <View style={{width:'90%', height:'35%', padding:responsiveWidth(5), bottom:responsiveHeight(4.5), paddingRight:responsiveWidth(1)}}>
         <View style={{flexDirection:'row',alignItems:'center', justifyContent:'space-between' ,flexDirection:'row',}}>
-        <Text style={{fontFamily:Font.Regular, color:'#6B7280', fontSize:responsiveFontSize(2),}}>Invoice:<Text style={{fontFamily:Font.Bold, color:'#6B7280'}}> {item.invoice}</Text></Text>
-        <Text style={{fontFamily:Font.Regular, color:'#6B7280', fontSize:responsiveFontSize(2), marginLeft:responsiveWidth(0)}}>Wallet:<Text style={{fontFamily:Font.Bold, color:'#6B7280'}}> {item.wallet}</Text></Text>
+        <Text style={{fontFamily:Font.Regular, color:'#6B7280', fontSize:responsiveFontSize(2),}}>Cradit:<Text style={{fontFamily:Font.Bold, color:'#6B7280'}}> {item.credit}</Text></Text>
+        <Text style={{fontFamily:Font.Regular, color:'#6B7280', fontSize:responsiveFontSize(2), marginLeft:responsiveWidth(0)}}>Balance:<Text style={{fontFamily:Font.Bold, color:'#6B7280'}}> {item.total_balance}</Text></Text>
         </View>
-        <View style={{flexDirection:'row', height:responsiveWidth(9), alignItems:'center', justifyContent:'flex-end', marginTop:responsiveHeight(1), width:"120%", alignSelf:'center'}}>
-        <Icon name="edit" size={20} color={Color.primery} style={{marginRight:responsiveWidth(5)}}/>
-        <Icon1 name="delete" size={20} color="#ED718D" />
-        </View>
+        <View
+                style={{
+                  flexDirection: 'row',
+                  height: responsiveWidth(9),
+                  alignItems: 'center',
+                  justifyContent: 'flex-end',
+                  marginTop: responsiveHeight(1),
+                  width: '120%',
+                  marginLeft: responsiveWidth(10),
+                  width: '80%',
+                  justifyContent: 'space-around',
+                }}>
+                {/* <TouchableOpacity
+                  style={{
+                    width: responsiveWidth(20),
+                    height: responsiveHeight(3),
+                    backgroundColor: Color.primery,
+                    borderRadius: responsiveWidth(2),
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                  }}
+                  // onPress = {() => navigation.navigate('EditCustomer', item.uid )}
+                  >
+                  <Text
+                    style={{
+                      fontFamily: Font.Medium,
+                      fontSize: responsiveFontSize(1.8),
+                      color: Color.primery,
+                      color: Color.white,
+                    }}>
+                    Edit
+                  </Text>
+                </TouchableOpacity> */}
+                {/* <TouchableOpacity
+                  style={{
+                    width: responsiveWidth(20),
+                    height: responsiveHeight(3),
+                    backgroundColor: '#d11a2a',
+                    borderRadius: responsiveWidth(2),
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                  }}
+                  onPress={() => deleteCustomer(item.uid)}
+                  >
+                  <Text
+                    style={{
+                      fontFamily: Font.Medium,
+                      fontSize: responsiveFontSize(1.8),
+                      color: Color.primery,
+                      color: Color.white,
+                    }}>
+                    Delete
+                  </Text>
+                </TouchableOpacity> */}
+              </View>
       </View>
     </View>
     }

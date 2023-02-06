@@ -1,20 +1,116 @@
 import { View, Text, Image, ScrollView, TouchableOpacity, Dimensions } from 'react-native'
-import React from 'react'
+import React, {useEffect , useState} from 'react'
 import Color from '../components/Color'
 import { responsiveFontSize, responsiveHeight, responsiveWidth } from 'react-native-responsive-dimensions'
 import Font from '../components/Font'
-import {
-  LineChart,
-  BarChart,
-  PieChart,
-  ProgressChart,
-  ContributionGraph,
-  StackedBarChart
-} from "react-native-chart-kit";
+import {LineChart} from "react-native-chart-kit";
+import axios from 'axios'
 const windowWidth = Dimensions.get('window').width;
 const windowHeight = Dimensions.get('window').height;
 
+
 const Dashboard = ({navigation}) => {
+
+  const [company,setcompany]=useState('');
+  const [fetchProduct,setFetchProduct]=useState('');
+  const [fetchCustomer,setfetchCustomer]=useState('');
+  const getDataCompanyName = () => {
+
+  
+    var FormData = require('form-data');
+    var data = new FormData();
+    data.append(
+      '__api_key__',
+      'hi,-its-eevee. I can do wonderful things in api creation.',
+    );
+    var config = {
+      method: 'post',
+      url: 'https://api.accounts.lighthousepakistan.online/fetch_companies.php',
+      headers: {
+        'Content-Type': 'multipart/form-data', 
+        // 'Content-Type': 'multipart/form-data', 
+       
+      },
+      data: data,
+    };
+
+    axios(config)
+      .then(function (response) {
+        console.log('response from data---',response.data.data.companies[0].name);
+        setcompany(response.data.data.companies[0].name);
+      })
+      .catch(function (error) {
+        console.log(error);
+      });
+  };
+  const getDataProducts = () => {
+
+  
+    var FormData = require('form-data');
+    var data = new FormData();
+    data.append(
+      '__api_key__',
+      'hi,-its-eevee. I can do wonderful things in api creation.',
+    );
+    var config = {
+      method: 'post',
+      url: 'https://api.accounts.lighthousepakistan.online/fetch_products.php',
+      headers: {
+        'Content-Type': 'multipart/form-data', 
+
+      },
+      data: data,
+    };
+
+    axios(config)
+      .then(function (response) {
+        // console.log('response from data---',response.data.data.products.lenght);
+        let totalProducts = response.data.data.products;
+        setFetchProduct(totalProducts.length)
+        // console.log(fetchProduct);
+        // setcompany(response.data.data.companies[0].name);
+      })
+      .catch(function (error) {
+        console.log(error);
+      });
+  };
+  const getDataCustomer = () => {
+
+  
+    var FormData = require('form-data');
+    var data = new FormData();
+    data.append(
+      '__api_key__',
+      'hi,-its-eevee. I can do wonderful things in api creation.',
+    );
+    var config = {
+      method: 'post',
+      url: 'https://api.accounts.lighthousepakistan.online/fetch_customers.php',
+      headers: {
+         'Content-Type': 'multipart/form-data',                                                   
+      },
+      data: data,
+    };
+
+    axios(config)
+      .then(function (response) {
+        // console.log('response from data---',response.data.data.customers.length);
+        setfetchCustomer(response.data.data.customers.length)
+      })
+      .catch(function (error) {
+        console.log(error);
+      });
+  };
+  useEffect(() => {
+    getDataCompanyName();
+    getDataProducts();
+    getDataCustomer();
+  }, []);
+
+
+
+
+
   return (
     <View style={{flex:1, backgroundColor:Color.gray}}>
       {/* Header  */}
@@ -37,7 +133,7 @@ const Dashboard = ({navigation}) => {
         </View>
         <View style={{width:responsiveWidth(65), height:'100%', justifyContent:'center'}}>
           <Text style={{fontSize:responsiveFontSize(2.5), marginLeft:responsiveWidth(5), fontFamily:Font.Medium, color:'#1F2937'}}>Customers</Text>
-          <Text style={{fontSize:responsiveFontSize(3),marginLeft:responsiveWidth(5), fontFamily:'Roboto-Black', color:Color.primery}}>2</Text>
+          <Text style={{fontSize:responsiveFontSize(3),marginLeft:responsiveWidth(5), fontFamily:'Roboto-Black', color:Color.primery}}>{fetchCustomer}</Text>
         </View>
       </View>
       <View style={{backgroundColor:Color.white, width:responsiveWidth(95), height:responsiveHeight(10), elevation:3, alignSelf:"center", borderRadius:10, marginTop:responsiveHeight(2), flexDirection:'row'}}>
@@ -48,10 +144,10 @@ const Dashboard = ({navigation}) => {
         </View>
         <View style={{width:responsiveWidth(65), height:'100%', justifyContent:'center'}}>
           <Text style={{fontSize:responsiveFontSize(2.5), marginLeft:responsiveWidth(5), fontFamily:Font.Medium, color:'#1F2937'}}>Product</Text>
-          <Text style={{fontSize:responsiveFontSize(3),marginLeft:responsiveWidth(5), fontFamily:'Roboto-Black', color:Color.primery}}>2</Text>
+          <Text style={{fontSize:responsiveFontSize(3),marginLeft:responsiveWidth(5), fontFamily:'Roboto-Black', color:Color.primery}}>{fetchProduct}</Text>
         </View>
       </View>
-      <View style={{backgroundColor:Color.white, width:responsiveWidth(95), height:responsiveHeight(10), elevation:3, alignSelf:"center", borderRadius:10, marginTop:responsiveHeight(5), flexDirection:'row'}}>
+      <View style={{backgroundColor:Color.white, width:responsiveWidth(95), height:responsiveHeight(10), elevation:3, alignSelf:"center", borderRadius:10, marginTop:responsiveHeight(2), flexDirection:'row'}}>
         <View style={{width:responsiveWidth(30), height:'100%', alignItems:'center', justifyContent:'center'}}>
             <View style={{width:'60%', height:'75%', backgroundColor:'#C1C0D2', alignItems:'center', justifyContent:'center', borderRadius:10}}>
               <Image style={{width:50, height:50, borderRadius:responsiveWidth(2), tintColor:'#31316A'}} source={require('../assets/Images/company.png')}/>
@@ -59,7 +155,7 @@ const Dashboard = ({navigation}) => {
         </View>
         <View style={{width:responsiveWidth(65), height:'100%', justifyContent:'center'}}>
           <Text style={{fontSize:responsiveFontSize(2.5), marginLeft:responsiveWidth(5), fontFamily:Font.Medium, color:'#1F2937'}}>Company</Text>
-          <Text style={{fontSize:responsiveFontSize(3),marginLeft:responsiveWidth(5), fontFamily:'Roboto-Black', color:Color.primery}}>Green Foods</Text>
+          <Text style={{fontSize:responsiveFontSize(3),marginLeft:responsiveWidth(5), fontFamily:'Roboto-Black', color:Color.primery}}>{company}</Text>
         </View>
       </View>
 
