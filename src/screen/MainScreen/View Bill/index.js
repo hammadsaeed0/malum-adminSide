@@ -166,6 +166,7 @@ const [billList,setBillList]=useState([]);
         >
           <Text style={{color:Color.white, fontFamily:Font.Medium}}>Back</Text>
         </TouchableOpacity>
+        
         </View>
     </View>
   );
